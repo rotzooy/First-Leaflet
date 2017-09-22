@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+    	<link rel="stylesheet" href="main.css"/>
+    	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+        <title> My first leaflet map</title>
+    </head>
+    <body>
+  		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    	<H1>Introduction Leaflet</H1>
+    	<div id="map"></div>
+    	<script>
+			  //initialize the map         
+			  
+
+			  var map = L.map('map').setView([52.3600825, 5.0588801], 7);
+			  
+			  // add markers
+			  var bleiswijk = L.marker([52.0094799, 4.5384196]).addTo(map);
+			  var valburg = L.marker([51.9108668, 5.7881438]).addTo(map);
+			  var wur = L.marker([51.9691868, 5.6653948]).addTo(map);
+			  var amsterdam = L.marker([52.3702157, 4.8951679]).addTo(map);
+  
+				// name popups
+				var popup = "Thuis Esther";
+				bleiswijk.bindPopup(popup); 
+				var popup = "Thuis Mark";
+				valburg.bindPopup(popup); 
+				var popup = "WUR";
+				wur.bindPopup(popup); 
+				var popup = "Hoofdstad";
+				amsterdam.bindPopup(popup); 
+
+				// add shapes
+				var circle = L.circle([51.9691868, 5.6653948], 500, {
+				  color: 'green',
+				  fillColor: '#00ff00',
+				  fillOpacity: 0.2
+				}).addTo(map);
+				var polygon = L.polygon([
+				  [52.0094799, 4.5384196],
+				  [51.9108668, 5.7881438],
+				  [51.9691868, 5.6653948],
+				  [52.3702157, 4.8951679]
+				]).addTo(map);
+
+				// Create a marker first
+				var geojsonMarkerOptions = {
+				  radius: 8,
+				  fillColor: "#ff7800",
+				  color: "#000",
+				  weight: 1,
+				  opacity: 1,
+				  fillOpacity: 0.8
+				};
+
+				//create a empty geojson layer
+				var geojson = L.geoJson(null,{
+				  pointToLayer: function (feature, latlng) {
+				    return L.circleMarker(latlng, geojsonMarkerOptions);
+				  }
+				}).addTo(map);
+
+				var geojsonMarkerOptions = {
+				  radius: 8,
+				  fillColor: "#42f4ce",
+				  color: 'black',
+				  weight: 1,
+				  opacity: 1,
+				  fillOpacity: 0.8
+				};
+  
+				// new Http Request
+				var xhttp = new XMLHttpRequest();
+
+				// set the request method and data file
+				xhttp.open('GET', encodeURI("All_BFRO_Reports_points.geojson"));
+
+				//specify what must be done with the geojson data to the layer when request is succesfull
+				xhttp.onload = function() {
+				  if (xhttp.readyState === 4) {
+				      // add the json data to the geojson layer we created before!
+				      geojson.addData(JSON.parse(xhttp.responseText));
+				    } else {
+				      alert('Request failed.  Returned status of ' + xhttp.status);
+				    }
+				};
+
+				// send the request
+				xhttp.send();
+
+				  //Create baselayer - tiles         
+				  var backgroundMap = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',{
+				    attribution: '<a href="http://openstreetmap.org">OpenStreetMap</a>contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+				    		maxZoom: 19
+				    		}
+				  		);
+				  
+				  		backgroundMap.addTo(map);
+		</script>
+   </body>
+  </html>
